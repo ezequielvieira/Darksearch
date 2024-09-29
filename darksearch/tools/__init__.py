@@ -1,1 +1,1 @@
-from elas import DarkElastic
+from .elas import DarkElastic

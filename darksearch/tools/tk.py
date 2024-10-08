@@ -57,9 +57,9 @@ class Tikify(object):
 if __name__ == "__main__":
     dataPath = os.getcwd()+'/../data/'
     logPath = os.getcwd()+'/../logs/scrape.log'
-    print 'Started...'
+    print('Started...')
     with open(logPath) as logs:
-        print 'Reading csv...'
+        print('Reading csv...')
         logs = pd.read_csv(
                             logs,
                             header=None,
@@ -83,7 +83,7 @@ if __name__ == "__main__":
             size = str(logs['SIZE'][i])
             try:
                 output = Tikify(dataPath + name)
-                content = unicode(output.content)
+                content = output.content
                 title = str(output.title)
                 lang = str(output.lang)
                 with open("../logs/process2.csv", "a") as log:

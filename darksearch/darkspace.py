@@ -1,20 +1,8 @@
-#!/usr/bin/python
-
-import json
-from urllib import request  # Atualizado para Python 3
-import time
-import requests
 import re
-import sys
-import math
 import gc
-from tools import DarkElastic
-from flask import Flask, url_for, request, render_template, redirect
+import math
 from markupsafe import Markup
-
-# A função reload e sys.setdefaultencoding não são necessárias no Python 3
-# reload(sys)
-# sys.setdefaultencoding('utf8')
+from tools import DarkElastic
 
 class BackCheck(object):
     """
@@ -55,67 +43,67 @@ class BackCheck(object):
         )
         return self.results
     
-def make_pageBar(self, current, end):
-    start = 1
-    results = ""
-    back = ""
-    next = ""
-    if end >= 5:
-        end = current + 2
-    if current >= 3:
-        start = current - 2
-    else:
-        end = current + (5 - current)
-    if end > self.maxPages:
-        end = self.maxPages
-    for page in range(start, end + 1):
-        if page == current:
-            line = (
-                "<li ><a href=\"../search/%s\" method=\"post\">"
-                "<font color=\"red\"><b>%s</font> </a></li>"
-                % (page, page)
-            )
+    def make_pageBar(self, current, end):
+        start = 1
+        results = ""
+        back = ""
+        next = ""
+        if end >= 5:
+            end = current + 2
+        if current >= 3:
+            start = current - 2
         else:
-            line = "<li ><a href=\"../search/%s\" method=\"post\">%s </a></li>" % (page, page)
-        results = results + line
-    if (current - 1) > 0:
-        back = "<li ><a href=\"../search/%s\" method=\"post\"> Prev </a></li>" % (current - 1)
-    if (current + 1) <= end:
-        next = "<li ><a href=\"../search/%s\" method=\"post\"> Next </a></li>" % (current + 1)
-    return (back + results + next)
+            end = current + (5 - current)
+        if end > self.maxPages:
+            end = self.maxPages
+        for page in range(start, end + 1):
+            if page == current:
+                line = (
+                    "<li ><a href=\"../search/%s\" method=\"post\">"
+                    "<font color=\"red\"><b>%s</font> </a></li>"
+                    % (page, page)
+                )
+            else:
+                line = "<li ><a href=\"../search/%s\" method=\"post\">%s </a></li>" % (page, page)
+            results = results + line
+        if (current - 1) > 0:
+            back = "<li ><a href=\"../search/%s\" method=\"post\"> Prev </a></li>" % (current - 1)
+        if (current + 1) <= end:
+            next = "<li ><a href=\"../search/%s\" method=\"post\"> Next </a></li>" % (current + 1)
+        return (back + results + next)
 
-def darkSites(self, currentPage, limitResults=10):
-    # Clean up
-    gc.collect()
-    #  Start ElasticSearch
-    elastic = DarkElastic()
-    elastic.search_index('dark', self.query)
-    self.numDark = elastic.size
-    self.maxPages = math.ceil((self.numDark) / float(limitResults))
-    self.maxPages = int(self.maxPages)
-    #  Displays 10 results per page
-    displayStart = int((currentPage * limitResults) - limitResults)
-    displayEnd = int((currentPage * limitResults))
-    elastic.search_index('dark', self.query, displayStart, limitResults)
-    descTotal = ''
-    self.pageBar = Markup(self.make_pageBar(currentPage, self.maxPages))
-    for val in elastic.briefList:
-        cat = elastic.check_cat(val)
-        i = elastic.briefList.index(val)
-        description = Markup(
-            self.darkResults(
-                elastic.titleList[i],
-                cat,
-                val,
-                elastic.namesList[i],
-                elastic.datesList[i]
+    def darkSites(self, currentPage, limitResults=10):
+        # Clean up
+        gc.collect()
+        #  Start ElasticSearch
+        elastic = DarkElastic()
+        elastic.search_index('dark', self.query)
+        self.numDark = elastic.size
+        self.maxPages = math.ceil((self.numDark) / float(limitResults))
+        self.maxPages = int(self.maxPages)
+        #  Displays 10 results per page
+        displayStart = int((currentPage * limitResults) - limitResults)
+        displayEnd = int((currentPage * limitResults))
+        elastic.search_index('dark', self.query, displayStart, limitResults)
+        descTotal = ''
+        self.pageBar = Markup(self.make_pageBar(currentPage, self.maxPages))
+        for val in elastic.briefList:
+            cat = elastic.check_cat(val)
+            i = elastic.briefList.index(val)
+            description = Markup(
+                self.darkResults(
+                    elastic.titleList[i],
+                    cat,
+                    val,
+                    elastic.namesList[i],
+                    elastic.datesList[i]
+                )
             )
-        )
-        descTotal = descTotal + description
-    elastic.free_mem()  # Attempting to free up memory..
-    del elastic
-    return Markup(descTotal)
+            descTotal = descTotal + description
+        elastic.free_mem()  # Attempting to free up memory..
+        del elastic
+        return Markup(descTotal)
 
 if __name__ == '__main__':
     example = BackCheck('John Smith')
-    print(example.output)
+    print(example.darkSites(1))

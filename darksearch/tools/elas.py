@@ -8,7 +8,11 @@ import re
 import gc
 from elasticsearch import Elasticsearch
 
-es = Elasticsearch(hosts=["https://150c57661e174c5e910932c24665a833.southamerica-east1.gcp.elastic-cloud.com:443"])
+# Adicione suas credenciais de autenticação aqui
+es = Elasticsearch(
+    hosts=["https://150c57661e174c5e910932c24665a833.southamerica-east1.gcp.elastic-cloud.com:443"],
+    http_auth=("elastic", "k2W8gl8D9xi1SGVy592aZG31")  # Substitua "seu_usuario" e "sua_senha" pelas suas credenciais
+)
 
 class DarkElastic(object):
 
@@ -72,6 +76,11 @@ class DarkElastic(object):
         return res['_source']
 
     def search_index(self, myIndex, myQuery, start=0, end=10):
+        # Verifique se o índice existe
+        if not es.indices.exists(index=myIndex):
+            print(f"Índice '{myIndex}' não encontrado. Criando índice...")
+            es.indices.create(index=myIndex)
+
         res = es.search(
             index=myIndex,
             body={
@@ -149,7 +158,7 @@ class DarkElastic(object):
         self.pandas_to_json(jsonPath)
         self.save_json(self.searchIndex)
 
-    def delete_duplicates(self, i):
+    def delete_duplicates(self , i):
         pass
 
     def delete_all(self, index='dark'):

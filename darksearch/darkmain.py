@@ -38,7 +38,7 @@ def deFace(alias):
     """
     Run query from darkspace.BackCheck.
     """
-    search = BackCheck(alias)
+    search = BackCheck(query=alias)
     return search
 
 @app.route("/", methods=['POST', 'GET'])
@@ -66,7 +66,7 @@ def search(page=1):
     pageBar = alias.pageBar  # Do not turn to str.
     dur = ('%.3f') % (time.time() - start_time)
     make_logs(query, dur, results, page)
-    if page > pageTotal:
+    if page > int(pageTotal):
         abort(404)
     return render_template(
         'search.html',
@@ -113,7 +113,7 @@ def user_get(text, page=1):
     pageTotal = str(alias.maxPages)
     dur = ('%.3f') % (time.time() - start_time)
     make_logs(query, dur, results, page)
-    if page > pageTotal:
+    if page > int(pageTotal):
         return '404 Error'
     return jsonify(
         {
